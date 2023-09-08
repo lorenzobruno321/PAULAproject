@@ -131,12 +131,16 @@ for k in range(0, pau.h_year):
 
 
 '''
-def Constraint_max_P_pv(m, i_pv):  
-    return 
+# PV
+def Constraint_max_P_pv(m, i_pv):  # installed pv power can be limited
+    return m.P_pv[i_pv] <= m.max_P_pv
 model.Constr_pv1 = pyo.Constraint(model.i_pv, rule=Constraint_max_P_pv)
-def Constraint_max_x_pv(m, t, i_pv):  
-    return 
-model.Constr_pv2 = pyo.Constraint(model.t, model.i_pv, rule=Constraint_max_x_pv)
+
+# instantaneous pv power is <= than available = installed * forecast
+def Constraint_max_x_pv(m, t, i_pv):
+    return m.x_pv[t, i_pv] <= m.P_pv[i_pv] * m.forecast_pv[t, i_pv]
+model.Constr_pv2 = pyo.Constraint(
+    model.t, model.i_pv, rule=Constraint_max_x_pv)
 
 # Wind
 def Constraint_max_P_wind(m, i_wind):  # installed wind power can be limited
